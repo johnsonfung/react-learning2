@@ -32,7 +32,7 @@ class ContentBlock extends React.Component {
         }
         
         // Let's find the content object that matches the id of the desitnation content block
-        let obj = this.props.lessonData.items[0].fields.contentBlocks.find(obj => obj.sys.id === destinationContentBlock);
+        let obj = this.props.lessonData.items[0].fields.contentBlocks.find(obj => obj.sys.id === destinationContentBlock.sys.id);
 
         // This will add all profile adding dispatches included in the button action.
         addToProfile(profileAddArray, this);

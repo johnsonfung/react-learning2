@@ -49,7 +49,7 @@ class InputText extends React.Component {
       Log.trace(null,null,"end")
       
       // find the personalized event and set the contentBlockData to that
-      let obj = this.props.contentBlock.props.lessonData.items[0].fields.contentBlocks.find(obj => obj.sys.id === personalizedEventInfo.personalizedEvent);
+      let obj = this.props.contentBlock.props.lessonData.items[0].fields.contentBlocks.find(obj => obj.sys.id === personalizedEventInfo.personalizedEvent.sys.id);
     this.props.contentBlock.setState({ contentBlockData: obj }, function() {
         Log.info("Successfully loaded component ContentBlock.js: "+this.state.contentBlockData.fields.title, "ContentBlock.js")
         Log.trace(null,null,"end")

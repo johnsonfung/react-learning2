@@ -336,19 +336,19 @@ export function personalizedEvents(that, inputKey, inputValue){
                 stoppedLoop = true;
                 Log.trace("Conditions met. Will use conditional event: "+that.props.events[i].fields.title, "personalizedEvents()")
                 Log.trace(null,null,"end")
-                return {"personalizedEvent": that.props.events[i].fields.eventDestination, "personalizedEventProfileAdd": that.props.events[i].fields.profileAdd}
+                return {"personalizedEvent": that.props.events[i].fields.eventDestinationRef, "personalizedEventProfileAdd": that.props.events[i].fields.profileAdd}
             }
         // if none of the conditions are met, then use the defaultEvent
         } if(stoppedLoop === false) {
             Log.trace("Conditions *not* met. Will use defaultEvent: "+that.props.defaultEvent.fields.title, "personalizedEvents()")
             Log.trace(null,null,"end")
-            return {"personalizedEvent": that.props.defaultEvent.fields.eventDestination, "personalizedEventProfileAdd": that.props.defaultEvent.fields.profileAdd}
+            return {"personalizedEvent": that.props.defaultEvent.fields.eventDestinationRef, "personalizedEventProfileAdd": that.props.defaultEvent.fields.profileAdd}
         }
     } else {
         // if there are no conditional events, then use the default event
         Log.trace("There are no conditional events. Will use defaultEvent: "+that.props.defaultEvent.fields.title, "personalizedEvents()", "start")
         Log.trace(null,null,"end")
-        return {"personalizedEvent": that.props.defaultEvent.fields.eventDestination, "personalizedEventProfileAdd": that.props.defaultEvent.fields.profileAdd}
+        return {"personalizedEvent": that.props.defaultEvent.fields.eventDestinationRef, "personalizedEventProfileAdd": that.props.defaultEvent.fields.profileAdd}
     }
 }
 
