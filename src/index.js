@@ -3,6 +3,13 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 import App from './components/App';
+import index from './js/index'
+
+// Add these lines:
+if (process.env.NODE_ENV !== 'production') {
+  localStorage.setItem('debug', 'henry-1-0:*');
+}
+
 
 ReactDOM.render( 
     <App />,
