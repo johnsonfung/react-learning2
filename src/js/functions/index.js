@@ -352,6 +352,34 @@ export function personalizedEvents(that, inputKey, inputValue){
     }
 }
 
+// Made a variation of personalized events where instead of taking in a component, it takes in an action object.
+export function personalizedEventsAutoAdvance(that){
+
+    if(typeof that.fields.events !== "undefined"){
+        var stoppedLoop = false;
+        Log.trace("Conditional events exist, will loop through to see which is relevant.", "personalizedEvents()", "start")
+        for(var i=0; i<that.fields.events.length; i++){
+            var event = that.fields.events[i].fields
+            if(conditionalEvents(that, event) === true){
+                stoppedLoop = true;
+                Log.trace("Conditions met. Will use conditional event: "+that.fields.events[i].fields.title, "personalizedEvents()")
+                Log.trace(null,null,"end")
+                return {"personalizedEvent": that.fields.events[i].fields.eventDestinationRef, "personalizedEventProfileAdd": that.fields.events[i].fields.profileAdd}
+            }
+        // if none of the conditions are met, then use the defaultEvent
+        } if(stoppedLoop === false) {
+            Log.trace("Conditions *not* met. Will use defaultEvent: "+that.fields.defaultEvent.fields.title, "personalizedEvents()")
+            Log.trace(null,null,"end")
+            return {"personalizedEvent": that.fields.defaultEvent.fields.eventDestinationRef, "personalizedEventProfileAdd": that.fields.defaultEvent.fields.profileAdd}
+        }
+    } else {
+        // if there are no conditional events, then use the default event
+        Log.trace("There are no conditional events. Will use defaultEvent: "+that.fields.defaultEvent.fields.title, "personalizedEvents()", "start")
+        Log.trace(null,null,"end")
+        return {"personalizedEvent": that.fields.defaultEvent.fields.eventDestinationRef, "personalizedEventProfileAdd": that.fields.defaultEvent.fields.profileAdd}
+    }
+}
+
 export function personalizeText(inputText, that){
     Log.trace("Personalizing text...", "personalizeText()", "start")
     if(typeof inputText !== "undefined"){
@@ -362,4 +390,70 @@ export function personalizeText(inputText, that){
     }
     Log.trace(null, null, "end")
     return personalizedText
+}
+
+
+export function renderActions(actionsArray, that){
+
+     // DEFINING THE ACTIONS AVAILABLE
+     var buttonArray = []
+     var inputArray = []
+     var dropdownArray = []
+     var autoAdvanceDestination = {}
+     var autoAdvanceProfileAdd = []
+
+         // filter out actions for buttons and inputs
+
+         for(var i=0; i<actionsArray.length; i++){
+             if(actionsArray[i].fields.actionType === "button"){
+                 buttonArray.push(actionsArray[i])
+             } else if(actionsArray[i].fields.actionType === "input"){
+                 inputArray.push(actionsArray[i])
+             } else if(actionsArray[i].fields.actionType === "dropdown"){
+                 // gotta do some work with dropdowns to grab the options
+                 var dropdownActionTemp = {}
+                 dropdownActionTemp = actionsArray[i]
+                 dropdownActionTemp.dropdownOptions = []
+
+                 // put all the options into the proper object format and add it to an object property
+                 var x = actionsArray[i].fields.dropdownChoices.split(', ');
+                 for(var t=0; t<x.length;t++){
+                     dropdownActionTemp.dropdownOptions.push({value: x[t], label: x[t]})    
+                 }
+                 dropdownArray.push(dropdownActionTemp)
+             } else if(actionsArray[i].fields.actionType === "autoAdvance"){
+                 Log.info("Setting autoAdvance action.", "AutoAdvance", "start")
+                       
+                 var personalizedEventInfo= personalizedEventsAutoAdvance(actionsArray[i])
+                 Log.trace("Setting the autoAdvance parameters", "AutoAdvance")
+                 autoAdvanceProfileAdd = personalizedEventInfo.personalizedEventProfileAdd
+
+                 // find the personalized event and set the contentBlockData to that
+                 let obj = findContentBlock(that.props.lessonData.items[0].fields.contentBlocks, personalizedEventInfo.personalizedEvent.sys.id)
+
+                 autoAdvanceDestination = obj
+
+                 Log.info("Successfully set autoAdvanceDestination to: "+obj.fields.title, "AutoAdvance")
+                 Log.trace(null,null,"end")
+
+             } else {
+                 Log.error("The action does not have an actionType: "+actionsArray.array[i].fields.title, "ContentBlock.js")
+                 Log.error(actionsArray.array[i], "ContentBlock.js")
+             }
+         }
+
+    return {"buttonArray": buttonArray, "inputArray": inputArray, "dropdownArray": dropdownArray, "autoAdvanceDestination": autoAdvanceDestination, "autoAdvanceProfileAdd": autoAdvanceProfileAdd}
+}
+
+export function executeAutoAdvance(autoAdvanceDestination, autoAdvanceProfileAdd, that){
+            Log.info("Executing autoAdvance", "AutoAdvance")
+            that.setState({ contentBlockData: autoAdvanceDestination }, function() {
+                addToProfile(autoAdvanceProfileAdd, that);
+                Log.info("Successfully loaded component ContentBlock.js: "+that.state.contentBlockData.fields.title, "ContentBlock.js")
+                Log.trace(null,null,"end")
+             });
+}
+
+export function findContentBlock(contentBlocksArray, sysId){
+    return contentBlocksArray.find(obj => obj.sys.id === sysId);
 }

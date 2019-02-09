@@ -4,12 +4,14 @@ import * as reduxActions from "../js/reducers/index";
 import { connect } from "react-redux";
 import { addToProfile } from "../js/functions/index";
 import { personalizeText } from "../js/functions/index";
+import { renderActions } from "../js/functions/index";
+import { executeAutoAdvance } from "../js/functions/index";
 import { conditionalActions } from "../js/functions/index";
+import { findContentBlock } from "../js/functions/index";
 import InputText from './InputText';
 import InputDropdown from './InputDropdown';
 import ReactAudioPlayer from 'react-audio-player';
 import Log from '../js/functions/log';
-
 
 class ContentBlock extends React.Component {
     // Props: firstLesson (obj), lessonData (obj)
@@ -32,7 +34,7 @@ class ContentBlock extends React.Component {
         }
         
         // Let's find the content object that matches the id of the desitnation content block
-        let obj = this.props.lessonData.items[0].fields.contentBlocks.find(obj => obj.sys.id === destinationContentBlock.sys.id);
+        let obj = findContentBlock(this.props.lessonData.items[0].fields.contentBlocks, destinationContentBlock.sys.id)
 
         // This will add all profile adding dispatches included in the button action.
         addToProfile(profileAddArray, this);
@@ -42,6 +44,10 @@ class ContentBlock extends React.Component {
             Log.info("Successfully loaded component ContentBlock.js: "+this.state.contentBlockData.fields.title, "ContentBlock.js")
             Log.trace(null,null,"end")
           });
+
+    }
+
+    componentDidUpdate(){
 
     }
 
@@ -67,35 +73,8 @@ class ContentBlock extends React.Component {
             Log.error("Required prop missing: firstLesson", "ContentBlock.js")
         }
 
-        // DEFINING THE ACTIONS AVAILABLE
-        var actionsArray = conditionalActions(this)
-        var buttonArray = []
-        var inputArray = []
-        var dropdownArray = []
-
-            // filter out actions for buttons and inputs
-            for(var i=0; i<actionsArray.length; i++){
-                if(actionsArray[i].fields.actionType === "button"){
-                    buttonArray.push(actionsArray[i])
-                } else if(actionsArray[i].fields.actionType === "input"){
-                    inputArray.push(actionsArray[i])
-                } else if(actionsArray[i].fields.actionType === "dropdown"){
-                    // gotta do some work with dropdowns to grab the options
-                    var dropdownActionTemp = {}
-                    dropdownActionTemp = actionsArray[i]
-                    dropdownActionTemp.dropdownOptions = []
-
-                    // put all the options into the proper object format and add it to an object property
-                    var x = actionsArray[i].fields.dropdownChoices.split(', ');
-                    for(var t=0; t<x.length;t++){
-                        dropdownActionTemp.dropdownOptions.push({value: x[t], label: x[t]})    
-                    }
-                    dropdownArray.push(dropdownActionTemp)
-                } else {
-                    Log.error("The action does not have an actionType: "+actionsArray.array[i].fields.title, "ContentBlock.js")
-                    Log.error(actionsArray.array[i], "ContentBlock.js")
-                }
-            }
+        // Defining the actions available so render can loop through and display each type of action
+        var availableActions = renderActions(conditionalActions(this), this)
 
         // Personalize the text output in case there are any special variables like {name}
         if(typeof this.state.contentBlockData.fields.text !== "undefined"){
@@ -109,6 +88,15 @@ class ContentBlock extends React.Component {
         } else {
             audioSrc = ""
         }
+
+        // When audio finishes playing function:
+        const onAudioEndFunction = () => {
+            // if there is autoAdvance actions 
+            if(typeof availableActions.autoAdvanceDestination.fields !== "undefined"){
+                executeAutoAdvance(availableActions.autoAdvanceDestination, availableActions.autoAdvanceProfileAdd, this)
+            }
+        }
+
         return(
             <div>
                 <div className="contentBlockTitle">{this.state.contentBlockData.fields.title}</div>
@@ -117,17 +105,18 @@ class ContentBlock extends React.Component {
                     src={audioSrc}
                     autoPlay
                     //controls
+                    onEnded={onAudioEndFunction}
                     />
                 </div>
                 <div className="contentBlockText"><p>{personalizedTextOutput}</p></div>
                 <div className="contentBlockButtons">
-                    {buttonArray.map(action =>
+                    {availableActions.buttonArray.map(action =>
                             <ChoiceButton key={action.sys.id} buttonTitle={action.fields.title} actionType={action.fields.actionType} btnText={action.fields.buttonText} events={action.fields.eventsArray} handler={this.handleClick} conditions={action.fields.conditions} conditionAndOr={action.fields.conditionAndOr} defaultEvent={action.fields.defaultEvent}/>
                     )}
-                    {inputArray.map(action =>
+                    {availableActions.inputArray.map(action =>
                             <InputText key={action.sys.id} id={action.sys.id} actionType={action.fields.actionType} inputKey={action.fields.inputKey} contentBlock={this} events={action.fields.eventsArray} defaultEvent={action.fields.defaultEvent} btnText={action.fields.buttonText} inputRequired={action.fields.inputRequired} defaultInput={action.fields.defaultInput} inputPlaceholderText={action.fields.inputPlaceholderText}/>
                     )}
-                    {dropdownArray.map(action =>
+                    {availableActions.dropdownArray.map(action =>
                             <InputDropdown key={action.sys.id} id={action.sys.id} actionType={action.fields.actionType} inputKey={action.fields.inputKey} contentBlock={this} events={action.fields.eventsArray} defaultEvent={action.fields.defaultEvent} btnText={action.fields.buttonText} dropdownOptions={action.dropdownOptions} inputRequired={action.fields.inputRequired} dropdownDefaultChoice={action.fields.defaultInput} inputPlaceholderText={action.fields.inputPlaceholderText}/>
                     )}
                 </div>
