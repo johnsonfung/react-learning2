@@ -5,10 +5,11 @@
   "dependencies": {
     "contentful": "^7.0.5",
     "debug": "^4.1.1",
+    "parse-srt": "^1.0.0-alpha",
     "react": "^16.6.3",
     "react-audio-player": "^0.11.0",
     "react-dom": "^16.6.3",
-    "react-scripts": "2.1.1",
+    "react-scripts": "^2.1.5",
     "react-select": "^2.3.0"
   },
   "scripts": {

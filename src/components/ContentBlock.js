@@ -8,10 +8,12 @@ import { renderActions } from "../js/functions/index";
 import { executeAutoAdvance } from "../js/functions/index";
 import { conditionalActions } from "../js/functions/index";
 import { findContentBlock } from "../js/functions/index";
+import Subtitles from './Subtitles';
 import InputText from './InputText';
 import InputDropdown from './InputDropdown';
 import ReactAudioPlayer from 'react-audio-player';
 import Log from '../js/functions/log';
+import parseSRT from 'parse-srt'
 
 class ContentBlock extends React.Component {
     // Props: firstLesson (obj), lessonData (obj)
@@ -20,6 +22,7 @@ class ContentBlock extends React.Component {
         super(props);
         this.state={
             contentBlockData: this.props.firstLesson,
+            currentSubtitles: "",
         }
         this.handleClick = this.handleClick.bind(this);
       }
@@ -97,6 +100,22 @@ class ContentBlock extends React.Component {
             }
         }
 
+        //Subtitles
+        var subtitlesSRT = this.state.contentBlockData.fields.subtitles
+        var subtitlesJSON = parseSRT(subtitlesSRT)
+
+        const onAudioListenFunction = () => {
+            for(var i=0;i<subtitlesJSON.length;i++){
+                if(Math.round( this.audioPlayer.audioEl.currentTime * 10) / 10 === Math.round( subtitlesJSON[i].start * 10) / 10){
+                    this.setState({ currentSubtitles: subtitlesJSON[i].text });
+                    console.log(this.state.currentSubtitles)
+                } else if(Math.round( this.audioPlayer.audioEl.currentTime * 10) / 10 === Math.round( subtitlesJSON[i].end * 10) / 10){
+                    this.setState({currentSubtitles: ""});
+                }
+            }
+        }
+
+
         return(
             <div>
                 <div className="contentBlockTitle">{this.state.contentBlockData.fields.title}</div>
@@ -106,9 +125,15 @@ class ContentBlock extends React.Component {
                     autoPlay
                     //controls
                     onEnded={onAudioEndFunction}
+                    listenInterval={100}
+                    onListen={onAudioListenFunction}
+                    ref={(element) => { this.audioPlayer = element; }}
                     />
                 </div>
                 <div className="contentBlockText"><p>{personalizedTextOutput}</p></div>
+                <div className="contentBlockSubtitles">
+                    <p>{this.state.currentSubtitles}</p>
+                </div>
                 <div className="contentBlockButtons">
                     {availableActions.buttonArray.map(action =>
                             <ChoiceButton key={action.sys.id} buttonTitle={action.fields.title} actionType={action.fields.actionType} btnText={action.fields.buttonText} events={action.fields.eventsArray} handler={this.handleClick} conditions={action.fields.conditions} conditionAndOr={action.fields.conditionAndOr} defaultEvent={action.fields.defaultEvent}/>

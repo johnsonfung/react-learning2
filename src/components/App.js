@@ -18,7 +18,7 @@ class App extends React.Component {
                     <Provider store={store}>      
                         <ErrorBar />
                         <div className="app">
-                            <Lesson entryId="7iHYSjGgh4rXpiXKNQVF2J" />
+                            <Lesson entryId="1ecjYEtRnLETyqurjePS6M" />
                         </div>
                         <ProfileLog />
                     </Provider>  

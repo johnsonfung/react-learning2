@@ -422,7 +422,8 @@ export function renderActions(actionsArray, that){
                  }
                  dropdownArray.push(dropdownActionTemp)
              } else if(actionsArray[i].fields.actionType === "autoAdvance"){
-                 Log.info("Setting autoAdvance action.", "AutoAdvance", "start")
+                 if(typeof autoAdvanceDestination.fields === "undefined"){
+                    Log.info("Setting autoAdvance action.", "AutoAdvance", "start")
                        
                  var personalizedEventInfo= personalizedEventsAutoAdvance(actionsArray[i])
                  Log.trace("Setting the autoAdvance parameters", "AutoAdvance")
@@ -436,6 +437,11 @@ export function renderActions(actionsArray, that){
                  Log.info("Successfully set autoAdvanceDestination to: "+obj.fields.title, "AutoAdvance")
                  Log.trace(null,null,"end")
 
+                 } else {
+                    Log.info("AutoAdvanced Already Set.", "AutoAdvance", "start")
+                    Log.trace(null,null,"end")
+                 }
+                 
              } else {
                  Log.error("The action does not have an actionType: "+actionsArray.array[i].fields.title, "ContentBlock.js")
                  Log.error(actionsArray.array[i], "ContentBlock.js")

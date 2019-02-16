@@ -38,7 +38,14 @@ class ProfileLog extends React.Component {
 
 
 const mapStateToProps = state => {
-    return { name: state.name, age: state.age, cerealChoice: state.cerealChoice, debug: state.debug };
+    return { 
+        name: state.name, 
+        age: state.age, 
+        emotionInvesting: state.emotionInvesting, 
+        abilityBasicExpenses: state.abilityBasicExpenses,
+        abilityCreditCard: state.abilityCreditCard,
+        balanceCreditCard: state.balanceCreditCard,
+        debug: state.debug };
   };
 
 
