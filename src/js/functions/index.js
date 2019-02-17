@@ -383,7 +383,7 @@ export function personalizedEventsAutoAdvance(that){
 export function personalizeText(inputText, that){
     Log.trace("Personalizing text...", "personalizeText()", "start")
     if(typeof inputText !== "undefined"){
-        var personalizedText = inputText.replace( /{name}/g, that.props.name)
+        var personalizedText = inputText.replace( /\$name/g, that.props.name)
         Log.trace("Replaced {name} with {"+that.props.name+"}", "personalizeText()")
     } else {
         personalizedText = ""

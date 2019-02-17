@@ -130,17 +130,22 @@ class ContentBlock extends React.Component {
             }
         }
 
-        //Emojis
-        var subtitlesEmojis = this.state.currentSubtitles
+        //Subtitle Replacements (Emojis and Names)
+        var personalizedSubtitles = this.state.currentSubtitles
 
+        // Note that text replacement has to go first, because once the Emojis are added, it is JSX and not a string
+        personalizedSubtitles = personalizeText(personalizedSubtitles, this)
+
+        // Replacing for Emojis
         const matchFunction = (match, i) => (
             <Emoji symbol={x.symbol} label={x.label} key={i}/>
         )
 
         for(var i=0; i<this.props.emojis.length;i++){
             var x = this.props.emojis[i]
-            subtitlesEmojis = reactStringReplace(subtitlesEmojis, x.trigger, matchFunction)
+            personalizedSubtitles = reactStringReplace(personalizedSubtitles, x.trigger, matchFunction)
         }
+
 
         return(
             <div>
@@ -161,7 +166,7 @@ class ContentBlock extends React.Component {
                     <div className="contentBlockSubtitles">
                     <Animated animationIn="fadeInUp" animationOut="fadeOut" isVisible={this.state.currentSubtitlesVisible}>
                             <div className="subtitlesText">
-                                {subtitlesEmojis}
+                                {personalizedSubtitles}
                             </div>
                         </Animated>
                     </div>
