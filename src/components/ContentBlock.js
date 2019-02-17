@@ -14,6 +14,8 @@ import ReactAudioPlayer from 'react-audio-player';
 import Log from '../js/functions/log';
 import parseSRT from 'parse-srt'
 import {Animated} from "react-animated-css";
+import Emoji from 'a11y-react-emoji'
+const reactStringReplace = require('react-string-replace');
 
 class ContentBlock extends React.Component {
     // Props: firstLesson (obj), lessonData (obj)
@@ -128,6 +130,17 @@ class ContentBlock extends React.Component {
             }
         }
 
+        //Emojis
+        var subtitlesEmojis = this.state.currentSubtitles
+
+        const matchFunction = (match, i) => (
+            <Emoji symbol={x.symbol} label={x.label} key={i}/>
+        )
+
+        for(var i=0; i<this.props.emojis.length;i++){
+            var x = this.props.emojis[i]
+            subtitlesEmojis = reactStringReplace(subtitlesEmojis, x.trigger, matchFunction)
+        }
 
         return(
             <div>
@@ -148,7 +161,7 @@ class ContentBlock extends React.Component {
                     <div className="contentBlockSubtitles">
                     <Animated animationIn="fadeInUp" animationOut="fadeOut" isVisible={this.state.currentSubtitlesVisible}>
                             <div className="subtitlesText">
-                                {this.state.currentSubtitles}
+                                {subtitlesEmojis}
                             </div>
                         </Animated>
                     </div>

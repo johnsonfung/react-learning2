@@ -1,5 +1,5 @@
 // All the actions
-export const addArticle = article => ({ type: "ADD_ARTICLE", payload: article });
+export const addEmoji = emoji => ({ type: "ADD_EMOJI", payload: emoji });
 export const changeName = name => ({ type: "CHANGE_NAME", payload: name });
 export const changeAge = age => ({ type: "CHANGE_AGE", payload: age });
 export const changeEmotionInvesting = emotion => ({ type: "CHANGE_EMOTIONINVESTING", payload: emotion });
@@ -13,6 +13,7 @@ export const toggleDebug = debug => ({ type: "TOGGLE_DEBUG", payload: debug });
 // All the mapDispatchToProps definitions
 export const mapAllDispatchToProps = dispatch => {
     return {
+        addEmoji: emoji => dispatch(addEmoji(emoji)),  
         changeName: name => dispatch(changeName(name)),
         changeAge: age => dispatch(changeAge(age)),
         changeEmotionInvesting: emotion => dispatch(changeEmotionInvesting(emotion)),
@@ -27,6 +28,7 @@ export const mapAllDispatchToProps = dispatch => {
 
 export const mapAllStateToProps = state => {
   return {
+    emojis: state.emojis,
     name: state.name,
     age: state.age,
     emotionInvesting: state.emotionInvesting,
@@ -39,7 +41,7 @@ export const mapAllStateToProps = state => {
 
 // The initial state
 const initialState = {
-  articles: [],
+  emojis: [],
   name: "Friend",
   age: 27,
   emotionInvesting: "unknown",
@@ -51,8 +53,8 @@ const initialState = {
 
 const rootReducer = (state = initialState, action) => {
   switch (action.type) {
-    case "ADD_ARTICLE":
-      return { ...state, articles: [...state.articles, action.payload] };
+    case "ADD_EMOJI":
+      return { ...state, emojis: [...state.emojis, action.payload] };
     case "CHANGE_NAME":
       return {...state, name: action.payload}
     case "CHANGE_AGE":

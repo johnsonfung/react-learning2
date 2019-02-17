@@ -453,7 +453,8 @@ export function renderActions(actionsArray, that){
 
 export function executeAutoAdvance(autoAdvanceDestination, autoAdvanceProfileAdd, that){
             Log.info("Executing autoAdvance", "AutoAdvance")
-            that.setState({ contentBlockData: autoAdvanceDestination, actionsVisible: false }, function() {
+            fadeOutSubs(that);
+            that.setState({ contentBlockData: autoAdvanceDestination, actionsVisible: false}, function() {
                 addToProfile(autoAdvanceProfileAdd, that);
                 Log.info("Successfully loaded component ContentBlock.js: "+that.state.contentBlockData.fields.title, "ContentBlock.js")
                 Log.trace(null,null,"end")
@@ -463,3 +464,10 @@ export function executeAutoAdvance(autoAdvanceDestination, autoAdvanceProfileAdd
 export function findContentBlock(contentBlocksArray, sysId){
     return contentBlocksArray.find(obj => obj.sys.id === sysId);
 }
+
+export function fadeOutSubs(that, callback){
+    if(that.state.currentSubtitlesVisible !== false){
+        that.setState({currentSubtitlesVisible: false}, callback);
+    }
+}
+
