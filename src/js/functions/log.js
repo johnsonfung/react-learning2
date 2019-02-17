@@ -19,6 +19,7 @@ class Log {
     if(source) { createDebug(source, message); }
     else { createDebug(message); }
     */
+   /*
 
     var textColor = COLOURS[level];
 
@@ -34,6 +35,7 @@ class Log {
     } else if(group === "end"){
       console.groupEnd();
     }
+    */
 
   }
   

@@ -453,7 +453,7 @@ export function renderActions(actionsArray, that){
 
 export function executeAutoAdvance(autoAdvanceDestination, autoAdvanceProfileAdd, that){
             Log.info("Executing autoAdvance", "AutoAdvance")
-            that.setState({ contentBlockData: autoAdvanceDestination }, function() {
+            that.setState({ contentBlockData: autoAdvanceDestination, actionsVisible: false }, function() {
                 addToProfile(autoAdvanceProfileAdd, that);
                 Log.info("Successfully loaded component ContentBlock.js: "+that.state.contentBlockData.fields.title, "ContentBlock.js")
                 Log.trace(null,null,"end")

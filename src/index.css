@@ -87,7 +87,7 @@ code {
 }
 
 .contentBlockText {
-  height:500px;
+  height:450px;
   margin-bottom:30px;
   margin-left:25px;
   margin-right:25px;
@@ -107,13 +107,33 @@ code {
   transform: translateY(-30%);
 }
 
-.contentBlockButtons {
-  text-align: center;
-  float:left;
+.contentBlockSubtitles {
+  padding:20px;
+  margin-bottom:20px;
+  font-family: brandon-grotesque,sans-serif;
+  font-weight: 500;
+  font-style: italic;
+  font-size:20px;
+  color:#333;
+  position:absolute;
+  bottom:100px;
+}
+
+.subtitlesText {
+  line-height:25px;
+}
+
+.contentBottomBlock{
   width:100%;
   position: absolute;
   bottom: 0;
   margin-bottom:20px;
+}
+
+.contentBlockButtons {
+  text-align: center;
+  float:left;
+  width:100%;
 }
 
 .choiceButton {
@@ -190,6 +210,7 @@ code {
   opacity:0.8;
   cursor: pointer;
 }
+
 
 
 textarea, select, input, button { outline: none; }
