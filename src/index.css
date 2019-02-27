@@ -1,7 +1,7 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+  font-family: brandon-grotesque, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -98,13 +98,23 @@ code {
 }
 
 .contentBlockText p {
-  font-size:40px;
+  font-size:50px;
+  font-weight:500;
+  line-height: 1.15em;
   text-align: left;
   position: relative;
   top: 50%;
   -ms-transform: translateY(-30%);
   -webkit-transform: translateY(-30%);
   transform: translateY(-30%);
+}
+
+.contentImage {
+  background-color: black;
+  width: 375px;
+  height:500px;
+  margin-left: -25px;
+  margin-top: -30px;
 }
 
 .contentBlockSubtitles {
@@ -114,8 +124,6 @@ code {
   font-weight: 500;
   font-size:20px;
   color:#333;
-  position:absolute;
-  bottom:100px;
 }
 
 .subtitlesText {
@@ -127,35 +135,66 @@ code {
   position: absolute;
   bottom: 0;
   margin-bottom:20px;
+  height: 200px;
 }
 
 .contentBlockButtons {
   text-align: center;
   float:left;
   width:100%;
+  height: 100px;
+}
+
+.contentBlockPermButtons {
+  text-align: center;
+  float:left;
+  width:100%;
+  height: 100px;
+  position:absolute;
+  bottom:-40px;
+}
+
+.permButton {
+  text-align:center;
+  padding:15px;
+  border-radius: 30px;
+  float:left;
+  font-size:15px;
+  font-family: brandon-grotesque,sans-serif;
+  font-weight:bold;
+  background-color:#DD0385;
+  color:#fff;
+  border:2px solid #fff;
 }
 
 .choiceButton {
   text-align:center;
-  padding:20px;
-  border-radius: 10px;
+  padding:15px;
+  border-radius: 30px;
   float:left;
-  font-size:12px;
+  font-size:15px;
+  font-family: brandon-grotesque,sans-serif;
+  font-weight:bold;
+  background-color:#DD0385;
+  color:#fff;
+  border:2px solid #fff;
 }
 
 .choiceButton:hover {
-  border: solid 1px #000;
+  border-color: #F93DE7;
+  cursor: pointer;
 }
 
 .buttonWrapper {
   display: inline-block;
   margin-right:10px;
-  margin-bottom:10px;
+  margin-bottom:0px;
 }
 
 .textInputForm input[type=text] {
-  padding:20px;
-  font-size:18px;
+  padding:16px;
+  font-size:20px;
+  color:#DD0385;
   margin-bottom:20px;
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
@@ -163,6 +202,8 @@ code {
   border-right-style:none;
   border-width:1px;
   border-color:#ccc;
+  font-family: brandon-grotesque,sans-serif;
+  font-weight:bold;
 }
 
 .textInputForm input[type=text]::placeholder {
@@ -172,12 +213,14 @@ code {
 .textInputForm input[type=submit] {
   -webkit-appearance: button;
   font-size:18px;
-  padding:20px;
+  padding:18px;
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
   color:#fff;
-  background-color: #FB8653;
-  border-color: rgb(201, 104, 63);
+  font-family: brandon-grotesque,sans-serif;
+  font-weight:bold;
+  background-color: #DD0385;
+  border-color: #F93DE7;
 }
 
 
@@ -210,6 +253,68 @@ code {
   cursor: pointer;
 }
 
+.head {
+  width:60px;
+  height:75px;
+  background-image:url("./images/faceTest/head.svg");
+  background-size: auto;
+  background-repeat: no-repeat;
+  margin:auto;
+  position: absolute;
+  top: -570px;
+  left: 290px;
+}
 
+.lEye {
+  width:9px;
+  height:5px;
+  position:absolute;
+  top:40px;
+  left:14px;
+}
+
+.rEye {
+  width:9px;
+  height:5px;
+  position:absolute;
+  top:39px;
+  left:36px;
+}
+
+#lEyeSmile, #rEyeSmile, #lEyeClosed, #rEyeClosed, #handPointUp, #mouthOpen {
+  visibility:hidden;
+}
+
+.nose {
+  width:5px;
+  position:absolute;
+  top:43px;
+  left:26px;
+  opacity:1;
+}
+
+.mouth {
+  width:18px;
+  position:absolute;
+  top:50px;
+  left:21px;
+  opacity:1;
+}
+
+.eyebrow {
+  width:5px;
+  position:absolute;
+  top:31px;
+  left:41px;
+  opacity:1;
+}
+
+.hand {
+  width:25px;
+  position:absolute;
+  top:40px;
+  left:-28px;
+  opacity:0;
+}
 
 textarea, select, input, button { outline: none; }

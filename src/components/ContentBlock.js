@@ -10,11 +10,15 @@ import { conditionalActions } from "../js/functions/index";
 import { findContentBlock } from "../js/functions/index";
 import InputText from './InputText';
 import InputDropdown from './InputDropdown';
+import AnimatedSvg from './AnimatedSvg';
+import AnimatedImage from './AnimatedImage';
 import ReactAudioPlayer from 'react-audio-player';
 import Log from '../js/functions/log';
 import parseSRT from 'parse-srt'
 import {Animated} from "react-animated-css";
-import Emoji from 'a11y-react-emoji'
+import Emoji from 'a11y-react-emoji';
+import AnimatedFace from "./AnimatedFace";
+import TweenMax from "gsap/TweenMax";
 const reactStringReplace = require('react-string-replace');
 
 class ContentBlock extends React.Component {
@@ -23,10 +27,13 @@ class ContentBlock extends React.Component {
     constructor(props) {
         super(props);
         this.state={
+            viewHistory: [],
             contentBlockData: this.props.firstLesson,
             currentSubtitles: "",
             currentSubtitlesVisible: false,
+            imageVisible: false,
             actionsVisible: false,
+            faceEmotion: ""
         }
         this.handleClick = this.handleClick.bind(this);
       }
@@ -47,11 +54,15 @@ class ContentBlock extends React.Component {
         addToProfile(profileAddArray, this);
 
         // This will change the current Content Block to the one defined in the Contentful field
-        this.setState({ contentBlockData: obj, actionsVisible: false }, function() {
-            Log.info("Successfully loaded component ContentBlock.js: "+this.state.contentBlockData.fields.title, "ContentBlock.js")
-            Log.trace(null,null,"end")
-          });
-
+        var viewHistory = this.state.viewHistory
+        viewHistory.push(this.state.contentBlockData)
+        viewHistory[viewHistory.length-1].profileAdds = profileAddArray
+        this.setState({viewHistory: viewHistory}, function(){
+            this.setState({contentBlockData: obj, actionsVisible: false, faceEmotion: "", imageVisible: true}, function() {
+                Log.info("Successfully loaded component ContentBlock.js: "+this.state.contentBlockData.fields.title, "ContentBlock.js")
+                Log.trace(null,null,"end")
+            });
+        })
     }
 
     componentDidUpdate(){
@@ -69,6 +80,7 @@ class ContentBlock extends React.Component {
         }
         Log.info("Successfully loaded component ContentBlock.js: "+this.state.contentBlockData.fields.title, "ContentBlock.js")
         Log.trace(null,null,"end")
+        TweenMax.fromTo(this.wholeContentBlock, 1, {opacity:0}, {opacity:1, delay:1});
     }
   
     componentWillUnmount() {
@@ -108,7 +120,11 @@ class ContentBlock extends React.Component {
         const onAudioEndFunction = () => {
             // if there is autoAdvance actions 
             if(typeof availableActions.autoAdvanceDestination.fields !== "undefined"){
-                executeAutoAdvance(availableActions.autoAdvanceDestination, availableActions.autoAdvanceProfileAdd, this)
+                var viewHistory = this.state.viewHistory
+                viewHistory.push(this.state.contentBlockData)
+                this.setState({viewHistory: viewHistory}, function(){
+                    executeAutoAdvance(availableActions.autoAdvanceDestination, availableActions.autoAdvanceProfileAdd, this)
+                })
             } else {
                 if(this.state.actionsVisible !== true){
                     this.setState({actionsVisible: true});
@@ -116,18 +132,66 @@ class ContentBlock extends React.Component {
             }
         }
 
-        //Subtitles
+        //Subtitles & Face Animations Definitions
         var subtitlesSRT = this.state.contentBlockData.fields.subtitles
         var subtitlesJSON = parseSRT(subtitlesSRT)
 
         const onAudioListenFunction = () => {
             for(var i=0;i<subtitlesJSON.length;i++){
                 if(Math.round( this.audioPlayer.audioEl.currentTime * 10) / 10 === Math.round( subtitlesJSON[i].start * 10) / 10){
-                    this.setState({ currentSubtitles: subtitlesJSON[i].text, currentSubtitlesVisible: true });
+                    this.setState({ currentSubtitles: subtitlesJSON[i].text, currentSubtitlesVisible: true }, function(){  
+
+                        // EMOTIONS LIST
+
+                        if(this.state.currentSubtitles.includes("improving") === true){
+                            this.setState({faceEmotion: "sideTilt"}, function(){
+                                this.setState({faceEmotion: ""})
+                            });
+                        } else if(this.state.currentSubtitles.includes("caught") === true){
+                            this.setState({faceEmotion: "thinking"}, function(){
+                                this.setState({faceEmotion: ""})
+                            });
+                        } else {
+                            this.setState({faceEmotion: "neutral"}, function(){
+                                this.setState({faceEmotion: ""})
+                            });
+                        }
+
+                    });
                 } else if(Math.round( this.audioPlayer.audioEl.currentTime * 10) / 10 === Math.round( subtitlesJSON[i].end * 10) / 10 && i+1 !== subtitlesJSON.length){
                     this.setState({currentSubtitlesVisible: false});
                 }
             }
+        }
+
+        const skipAudio = () => {
+            if(!isNaN(this.audioPlayer.audioEl.duration)){
+                this.audioPlayer.audioEl.currentTime = this.audioPlayer.audioEl.duration
+                this.setState({ currentSubtitles: subtitlesJSON[subtitlesJSON.length-1].text, currentSubtitlesVisible: true })
+            }
+        }
+
+        const backToPrevious = () => {
+            var immediatePreviousContent = this.state.viewHistory[this.state.viewHistory.length-1]
+            var viewHistory = this.state.viewHistory
+            viewHistory.pop();
+            if(typeof immediatePreviousContent.profileAdds !== "undefined"){
+                console.log("deleting state")
+                for(var i=0;i<immediatePreviousContent.profileAdds.length;i++){
+                    immediatePreviousContent.profileAdds[i].fields.value = ""
+                }
+                addToProfile(immediatePreviousContent.profileAdds, this);
+            }
+            // If we're backing right into the first contentBlock, show buttons and disable subtitles
+            if(viewHistory.length === 0){
+                this.setState({contentBlockData: immediatePreviousContent, viewHistory: viewHistory, actionsVisible: true, faceEmotion: "", imageVisible: true, currentSubtitlesVisible: false}, function(){         
+                })    
+            // Otherwise, show a normal mid-lesson setting
+            } else {
+                this.setState({contentBlockData: immediatePreviousContent, viewHistory: viewHistory, actionsVisible: false, faceEmotion: "", imageVisible: true}, function(){   
+                })
+            }
+            
         }
 
         //Subtitle Replacements (Emojis and Names)
@@ -137,8 +201,8 @@ class ContentBlock extends React.Component {
         personalizedSubtitles = personalizeText(personalizedSubtitles, this)
 
         // Replacing for Emojis
-        const matchFunction = (match, i) => (
-            <Emoji symbol={x.symbol} label={x.label} key={i}/>
+        const matchFunction = (match, z) => (
+            <Emoji symbol={x.symbol} label={x.label} key={z}/>
         )
 
         for(var i=0; i<this.props.emojis.length;i++){
@@ -146,9 +210,36 @@ class ContentBlock extends React.Component {
             personalizedSubtitles = reactStringReplace(personalizedSubtitles, x.trigger, matchFunction)
         }
 
+        // Animated SVG
+        if(typeof this.state.contentBlockData.fields.animationDelay !== "undefined"){
+            var animationDelay = Math.floor(this.state.contentBlockData.fields.animationDelay*1000)
+        } else {
+            animationDelay = true
+            //note that "true" means 'no delay"...I know, it's confusing. False would make the svg appear instantly.
+        }
+
+        if(typeof this.state.contentBlockData.fields.animationDuration !== "undefined"){
+            var animationDuration = Math.floor(this.state.contentBlockData.fields.animationDuration*1000)
+        } else {
+            animationDuration = 3000
+        }
+
+        if(typeof this.state.contentBlockData.fields.animationStagger !== "undefined"){
+            var animationStagger = this.state.contentBlockData.fields.animationStagger
+        } else {
+            animationStagger = 100
+        }
+
+        if(typeof this.state.contentBlockData.fields.animatedSvg !== "undefined"){
+            var animatedSvg = <AnimatedSvg svg={this.state.contentBlockData.fields.animatedSvg} duration={animationDuration} delay={animationDelay} stagger={animationStagger}/>
+        } else if(typeof this.state.contentBlockData.fields.image !== "undefined"){
+            animatedSvg = <Animated animationIn="fadeIn" animationOut="fadeOut" isVisible={this.state.imageVisible}><AnimatedImage src={this.state.contentBlockData.fields.image.fields.file.url}/></Animated>
+        } else {
+            animatedSvg = ""
+        }
 
         return(
-            <div>
+            <div ref={div => this.wholeContentBlock = div}>
                 <div className="contentBlockTitle">{this.state.contentBlockData.fields.title}</div>
                 <div className="contentAudioPlayer">
                 <ReactAudioPlayer
@@ -161,10 +252,13 @@ class ContentBlock extends React.Component {
                     ref={(element) => { this.audioPlayer = element; }}
                     />
                 </div>
-                <div className="contentBlockText"><p>{personalizedTextOutput}</p></div>
+                <div className="contentBlockText">
+                    <p>{personalizedTextOutput}</p>
+                    {animatedSvg}
+                </div>
                 <div className="contentBottomBlock">
                     <div className="contentBlockSubtitles">
-                    <Animated animationIn="fadeInUp" animationOut="fadeOut" isVisible={this.state.currentSubtitlesVisible}>
+                    <Animated animationIn="fadeInUp" animationOut="fadeOutDown" isVisible={this.state.currentSubtitlesVisible}>
                             <div className="subtitlesText">
                                 {personalizedSubtitles}
                             </div>
@@ -183,6 +277,13 @@ class ContentBlock extends React.Component {
                             )}
                         </div>
                     </Animated>
+                    <Animated animationIn="fadeIn" animationOut="instantOut" isVisible={!this.state.actionsVisible}>
+                        <div className="contentBlockPermButtons">
+                            <button className="permButtonSkip" onClick={() => backToPrevious()}>Back</button>
+                            <button className="permButtonSkip" onClick={() => skipAudio()}>Skip</button>
+                        </div>
+                    </Animated>
+                    <AnimatedFace faceEmotion={this.state.faceEmotion}/>
                 </div>
             </div>
         )

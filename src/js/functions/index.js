@@ -7,9 +7,11 @@ export function addToProfile(dispatchArray, that, input){
             if(dispatchArray[i].fields.inputOrDefined === "input" && typeof input !== "undefined" && input !== ""){
                 that.props[dispatchArray[i].fields.field](input);
                 Log.addToProfile("Modifying profile field: "+dispatchArray[i].fields.field+" -> "+input, "addToProfile()", "start")
+                console.log("Modifying profile field: "+dispatchArray[i].fields.field+" -> "+input)
             } else {
                 that.props[dispatchArray[i].fields.field](dispatchArray[i].fields.value);
                 Log.addToProfile("Modifying profile field: "+dispatchArray[i].fields.field+" -> "+dispatchArray[i].fields.value, "addToProfile()", "start")
+                console.log("Modifying profile field: "+dispatchArray[i].fields.field+" -> "+dispatchArray[i].fields.value)
             }
             Log.addToProfile(null,null,"end")
         }
@@ -454,7 +456,7 @@ export function renderActions(actionsArray, that){
 export function executeAutoAdvance(autoAdvanceDestination, autoAdvanceProfileAdd, that){
             Log.info("Executing autoAdvance", "AutoAdvance")
             fadeOutSubs(that);
-            that.setState({ contentBlockData: autoAdvanceDestination, actionsVisible: false}, function() {
+            that.setState({ contentBlockData: autoAdvanceDestination, actionsVisible: false, imageVisible: true}, function() {
                 addToProfile(autoAdvanceProfileAdd, that);
                 Log.info("Successfully loaded component ContentBlock.js: "+that.state.contentBlockData.fields.title, "ContentBlock.js")
                 Log.trace(null,null,"end")

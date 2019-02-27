@@ -51,22 +51,31 @@ const initialState = {
   debug: true
 };
 
+const revertToDefault = (field, action) => {
+  if(action.payload === ""){
+    return initialState[field]
+  } else {
+    return action.payload
+  }
+}
+
 const rootReducer = (state = initialState, action) => {
+
   switch (action.type) {
     case "ADD_EMOJI":
       return { ...state, emojis: [...state.emojis, action.payload] };
     case "CHANGE_NAME":
-      return {...state, name: action.payload}
+      return {...state, name: revertToDefault("name", action)}
     case "CHANGE_AGE":
-      return {...state, age: action.payload}
+      return {...state, age: revertToDefault("age", action)}
     case "CHANGE_EMOTIONINVESTING":
-      return {...state, emotionInvesting: action.payload}
+      return {...state, emotionInvesting: revertToDefault("emotionInvesting", action)}
     case "CHANGE_ABILITYBASICEXPENSES":
-      return {...state, abilityBasicExpenses: action.payload}
+      return {...state, abilityBasicExpenses: revertToDefault("abilityBasicExpenses", action)}
     case "CHANGE_ABILITYCREDITCARD":
-      return {...state, abilityCreditCard: action.payload}
+      return {...state, abilityCreditCard: revertToDefault("abilityCreditCard", action)}
     case "CHANGE_BALANCECREDITCARD":
-      return {...state, balanceCreditCard: action.payload}
+      return {...state, balanceCreditCard: revertToDefault("balanceCreditCard", action)}
     case "TOGGLE_DEBUG":
       return {...state, debug: action.payload}
     default:

@@ -15,7 +15,8 @@ class Lesson extends React.Component {
     componentDidMount() {
         var client = contentful.createClient({
             space: '6gkeigxyxcpy',
-            accessToken: 'a3ecbe25e1319fce737523dc37f9a63bf629f2930f2d5acf896b26b8669433b2' })
+            accessToken: '11124d798eb4964e0b2fbbe93f4be266f94187a4b6137a965140e92855ba8c8a'
+        })
         
         Log.trace("Connecting to Contentful...", "Lesson.js")
 

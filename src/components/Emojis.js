@@ -19,12 +19,11 @@ class Emojis extends React.Component {
         Log.trace("Connecting to Contentful...", "Emojis.js")
 
         client.getEntries({
-            include: 10,
-            "sys.id": "1Sb6GCwBueKgmhEC8yjSnf"
+            content_type: 'emoji'
             })
         .then((entry) => {
-            for(var i=0; i<entry.includes.Entry.length; i++){
-                var x = entry.includes.Entry[i].fields
+            for(var i=0; i<entry.items.length; i++){
+                var x = entry.items[i].fields
                 this.props.addEmoji({ symbol:x.symbol, label:x.label, trigger:x.trigger });
             }
         })

@@ -43,7 +43,7 @@ class InputDropdown extends React.Component {
       // find the personalized event and set the contentBlockData to that
       let obj = findContentBlock(this.props.contentBlock.props.lessonData.items[0].fields.contentBlocks, personalizedEventInfo.personalizedEvent.sys.id)
       
-      this.props.contentBlock.setState({ contentBlockData: obj }, function() {
+      this.props.contentBlock.setState({ contentBlockData: obj, actionsVisible: false, faceEmotion: "", imageVisible: true}, function() {
         Log.info("Successfully loaded component ContentBlock.js: "+this.state.contentBlockData.fields.title, "ContentBlock.js")
         Log.trace(null,null,"end")
         });

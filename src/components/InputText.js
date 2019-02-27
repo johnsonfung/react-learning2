@@ -6,8 +6,6 @@ import { personalizedEvents } from "../js/functions/index";
 import { findContentBlock } from "../js/functions/index";
 import Log from '../js/functions/log';
 
-
-
 class InputText extends React.Component {
     constructor(props) {
       super(props);
@@ -51,10 +49,17 @@ class InputText extends React.Component {
       
       // find the personalized event and set the contentBlockData to that
         let obj = findContentBlock(this.props.contentBlock.props.lessonData.items[0].fields.contentBlocks, personalizedEventInfo.personalizedEvent.sys.id)
-        this.props.contentBlock.setState({ contentBlockData: obj }, function() {
-        Log.info("Successfully loaded component ContentBlock.js: "+this.state.contentBlockData.fields.title, "ContentBlock.js")
-        Log.trace(null,null,"end")
-        });
+        
+        var viewHistory = this.props.contentBlock.state.viewHistory
+        viewHistory.push(this.props.contentBlock.state.contentBlockData)
+        viewHistory[viewHistory.length-1].profileAdds = personalizedEventInfo.personalizedEventProfileAdd
+        this.props.contentBlock.setState({viewHistory: viewHistory}, function(){
+          this.setState({ contentBlockData: obj, actionsVisible: false, faceEmotion: "", imageVisible: true}, function() {
+            Log.info("Successfully loaded component ContentBlock.js: "+this.state.contentBlockData.fields.title, "ContentBlock.js")
+            Log.trace(null,null,"end")
+          });
+        })
+        
     }
   
     render() {
